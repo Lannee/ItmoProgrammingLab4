@@ -10,10 +10,13 @@ import java.util.Arrays;
 public class Person implements GoTo, Say, Bury, Hide, Give, ThrowAway {
 
     private static int amount = 0;
-    private ArrayList<Status> statuses = new ArrayList<Status>(2);
-    private Storage storage = new Storage();
-    private String name;
-    private float[] position;
+    protected ArrayList<Status> statuses = new ArrayList<Status>(2);
+    protected Storage storage = new Storage();
+    protected String name;
+    protected float[] position;
+    protected int courage = 50;
+    protected int fear = 0;
+
 
     public Person(String name, float position[]) {
         amount++;
@@ -49,6 +52,37 @@ public class Person implements GoTo, Say, Bury, Hide, Give, ThrowAway {
         }
     }
 
+    public ArrayList<Status> getStatuses() {
+        return statuses;
+    }
+
+    public boolean hasStatus(Status status) {
+        if(this.getStatuses().isEmpty()) return false;
+        for(Status element : this.getStatuses()) {
+            if(element == status) return true;
+        }
+        return false;
+    }
+
+    public int getCourage() {
+        return courage;
+    }
+
+    public void setCourage(int courage) {
+        if(courage >= 0 && courage <= 100) {
+            this.courage = courage;
+        }
+    }
+
+    public int getFear() {
+        return fear;
+    }
+
+    public void setFear(int fear) {
+        if(fear >= 0 && fear <= 100) {
+            this.fear = fear;
+        }
+    }
 
     @Override
     public void goTo(Person person, boolean interactive) {
@@ -72,19 +106,21 @@ public class Person implements GoTo, Say, Bury, Hide, Give, ThrowAway {
     }
 
     @Override
-    public void bury(Item item, Terrain terrain, boolean interactive) {
+    public void bury(ItemType itemType, Terrain terrain, boolean interactive) {
         if(interactive) {
-            System.out.println(this + " закапывает предмет " + item);
+            System.out.println(this + " закапывает предметы ");
         }
-        this.hide(item, terrain.getStash(), false);
+        this.hide(itemType, terrain.getStash(), false);
     }
 
     @Override
-    public void hide(Item item, Stash stash, boolean interactive) {
+    public void hide(ItemType itemType, Stash stash, boolean interactive) {
         if(interactive) {
-            System.out.println(this + " прячет " + item);
+            System.out.print(this + " прячет ");
         }
-        if(this.getStorage().contains(item)) {
+        ArrayList<Item> items = this.getStorage().getItemsByClass(itemType);
+        for(Item item : items) {
+            System.out.print(item.getName() + " ");
             this.getStorage().removeItem(item);
             stash.getStorage().addItem(item);
         }
@@ -114,14 +150,28 @@ public class Person implements GoTo, Say, Bury, Hide, Give, ThrowAway {
         }
     }
 
+    public boolean isCloseTo(Person person) {
+        float xThis = this.getPosition()[0];
+        float yThis = this.getPosition()[1];
+        float zThis = this.getPosition()[2];
+
+        float xPer = person.getPosition()[0];
+        float yPer = person.getPosition()[1];
+        float zPer = person.getPosition()[2];
+
+        return xThis > xPer + 10 && xThis < xPer - 10 &&
+                yThis > yPer + 10 && yThis < yPer - 10 &&
+                zThis > zPer + 10 && zThis < zPer - 10;
+    }
+
     @Override
-    public void throwAway(Item classItem, boolean interactive) {
-        ArrayList<Item> items = this.getStorage().getItemsByClass(classItem);
-        System.out.println(items);
+    public void throwAway(ItemType itemType, boolean interactive) {
+        ArrayList<Item> items = this.getStorage().getItemsByClass(itemType);
         if(interactive) {
-            System.out.println(this + " выкидывает предметы " + classItem);
+            System.out.println(this + " выкидывает предметы ");
         }
         for(Item item : items) {
+            System.out.print(item.getName() + " ");
             this.getStorage().removeItem(item);
         }
     }

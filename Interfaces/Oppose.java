@@ -1,5 +1,8 @@
 package Interfaces;
 
+import People.Group;
+import People.Person;
+
 public interface Oppose {
-    void oppose();
+    void oppose(Group<?> group);
 }

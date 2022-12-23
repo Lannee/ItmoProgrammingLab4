@@ -1,11 +1,12 @@
 package People;
 
+import Interfaces.Oppose;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class PolicemanGroup extends Group<Policeman> {
+public class PolicemanGroup extends Group<Policeman> implements Oppose {
 
-    private ArrayList<Policeman> participants = new ArrayList<Policeman>();
     private static int amount = 0;
 
     public PolicemanGroup(String name, Policeman[] policemen) {
@@ -13,5 +14,9 @@ public class PolicemanGroup extends Group<Policeman> {
         this.participants.addAll(Arrays.asList(policemen));
     }
 
+    @Override
+    public void oppose(Group<?> group) {
+        System.out.println(this + " выступают против " + group);
+    }
 
 }

@@ -36,11 +36,50 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
     }
 
     public void addStatus(Status status) {
-        System.out.println(this + " получила статус " + status.name());
-        for(T participant : this.getParticipants()) {
+//        System.out.println(this + " получила статус " + status.name());
+        for(T participant : participants) {
             participant.addStatus(status);
         }
     }
+
+    public int getCourage() {
+        int result = 0;
+        for(T participant : participants) {
+            result += participant.getCourage();
+        }
+        return result / participants.size();
+    }
+
+    public void setCourage(int courage) {
+        System.out.println(" осмелели");
+        for(T participant : participants) {
+            participant.setCourage(courage);
+        }
+    }
+
+    public void addItem(Item item) {
+        System.out.println(this + " обрели предмет " + item);
+        for(T participant : participants) {
+            participant.getStorage().addItem(item);
+        }
+    }
+
+
+    public void setFear(int fear) {
+        System.out.println(this + " испугались.");
+        for(T participant : this.participants) {
+            participant.setFear(fear);
+        }
+    }
+
+    public int getFear() {
+        int fear = 0;
+        for(T participant : this.participants) {
+            fear += participant.getFear();
+        }
+        return fear / this.participants.size();
+    }
+
 
     @Override
     public void goTo(Person person, boolean interactive) {
@@ -68,36 +107,43 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
     }
 
     @Override
-    public void bury(Item item, Terrain terrain, boolean interactive) {
+    public void bury(ItemType itemType, Terrain terrain, boolean interactive) {
         if(interactive) {
-            System.out.println(this + " закапывает предметы " + item);
+            System.out.print(this + " закапывает предметы ");
         }
-        this.hide(item, terrain.getStash(), false);
+        this.hide(itemType, terrain.getStash(), false);
     }
 
     @Override
-    public void hide(Item item, Stash stash, boolean interactive) {
+    public void hide(ItemType itemType, Stash stash, boolean interactive) {
         if(interactive) {
-            System.out.println(this + " прячет " + item);
+            System.out.println(this + " прячет ");
         }
         for(T participant : this.getParticipants()) {
-            participant.hide(item, stash, false);
+            participant.hide(itemType, stash, false);
         }
+        System.out.println();
     }
 
     @Override
     public void give(Item item, Person person, boolean interactive) {
-        if(interactive) {
-            System.out.println(this + " передает " + item + " персонажу " + person);
-        }
-        for(T participant : this.getParticipants()) {
-            if(participant.getStorage().contains(item)) {
-                participant.getStorage().removeItem(item);
-                person.getStorage().addItem(item);
+        for (T participant : this.participants) {
+            if(participant.isCloseTo(person)) {
+                if(interactive) {
+                    System.out.println(this + " передает " + item + " персонажу " + person);
+                }
+                for(T par : this.getParticipants()) {
+                    if(par.getStorage().contains(item)) {
+                        par.getStorage().removeItem(item);
+                        person.getStorage().addItem(item);
+                        break;
+                    }
+
+                }
                 break;
             }
-
         }
+
     }
 
     @Override
@@ -116,13 +162,14 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
     }
 
     @Override
-    public void throwAway(Item classItem, boolean interactive) {
+    public void throwAway(ItemType itemType, boolean interactive) {
         if(interactive) {
-            System.out.println(this + " выкидывает предметы " + classItem);
+            System.out.print(this + " выкидывает предметы ");
         }
         for(int i = 0; i < this.getParticipants().size(); i++) {
-            this.getParticipants().get(i).throwAway(classItem, true);
+            this.getParticipants().get(i).throwAway(itemType, false);
         }
+        System.out.println();
     }
 
     @Override
@@ -150,6 +197,6 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
 
     @Override
     public String toString() {
-        return this.getName();
+        return "\"" + this.getName() + "\"";
     }
 }

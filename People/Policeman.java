@@ -2,10 +2,6 @@ package People;
 
 import Interfaces.Oppose;
 
-public class Policeman extends Person implements Oppose {
+public class Policeman extends Person {
 
-    @Override
-    public void oppose() {
-
-    }
 }

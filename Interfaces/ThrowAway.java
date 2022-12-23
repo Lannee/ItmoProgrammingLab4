@@ -1,8 +1,9 @@
 package Interfaces;
 
 import Classes.Item;
+import Classes.ItemType;
 
 public interface ThrowAway {
-    void throwAway(Item classItem, boolean interactive);
+    void throwAway(ItemType itemType, boolean interactive);
 
 }

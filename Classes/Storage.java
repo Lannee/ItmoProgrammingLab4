@@ -41,21 +41,19 @@ public class Storage {
         return false;
     }
 
-    public ArrayList<Item> getItemsByClass(Object classItem) {
-        var type = classItem.getClass();
+    public ArrayList<Item> getItemsByClass(ItemType itemType) {
         ArrayList<Item> itemsWithClass = new ArrayList<Item>();
         for(Item item : this.getItems()) {
-            if(item.getClass() == type) {
+            if(item.getType() == itemType) {
                 itemsWithClass.add(item);
             }
         }
         return itemsWithClass;
     }
 
-    public Item getItemByClass(Object classItem) {
-        var type = classItem.getClass();
+    public Item getItemByClass(ItemType itemType) {
         for(Item item : this.getItems()) {
-            if(item.getClass() == type) {
+            if(item.getType() == itemType) {
                 return item;
             }
         }

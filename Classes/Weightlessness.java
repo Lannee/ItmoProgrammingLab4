@@ -7,6 +7,7 @@ public class Weightlessness extends Item {
 
     public Weightlessness(String name) {
         super(name);
+        this.itemType = ItemType.WEIGHTLESSNESS;
     }
 
     public Weightlessness() {

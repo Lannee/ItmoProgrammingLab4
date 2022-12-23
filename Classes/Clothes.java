@@ -5,13 +5,14 @@ import People.Person;
 
 import java.util.ArrayList;
 
-public class Closes extends Item {
+public class Clothes extends Item {
 
-    public Closes(String name) {
+    public Clothes(String name) {
         super(name);
+        this.itemType = ItemType.CLOTHES;
     }
 
-    public Closes() {
+    public Clothes() {
         this("Одежда");
     }
 
