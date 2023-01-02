@@ -46,7 +46,7 @@ public class Main {
             pg.throwAway(ItemType.GUN, true);
             Terrain tr = new Terrain();
             pg.bury(ItemType.CLOTHES, tr, true);
-            new Clothes("Одежда рабочих").cloth(pg, true);
+            new Clothes("Одежда рабочих").dress(pg, true);
             pg.say("Это гораздо приятнее, чем летать сломя голову по воздуху в состоянии невесомости, получая ожоги, ранения и увечья");
         }
         else {

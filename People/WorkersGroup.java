@@ -13,7 +13,7 @@ public class WorkersGroup extends Group<Worker> implements Banish {
     private static int amount = 0;
 
     public static WorkersGroup getAny(ArrayList<WorkersGroup> groups) {
-        if(groups.isEmpty()) return null;
+        if(groups.isEmpty()) return (WorkersGroup)null;
         System.out.print("Некоторые группы рабочих");
         return groups.get((int)(Math.random() * groups.size() - 1));
     }

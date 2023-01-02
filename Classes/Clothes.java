@@ -17,14 +17,14 @@ public class Clothes extends Item {
     }
 
 
-    public void cloth(Person person, boolean interactive) {
+    public void dress(Person person, boolean interactive) {
         if(interactive) {
             System.out.println(person + " надевает на себя " + this);
         }
         person.getStorage().addItem(this);
     }
 
-    public void cloth(Group<? extends Person> group, boolean interactive) {
+    public void dress(Group<?> group, boolean interactive) {
         if(interactive) {
             System.out.println(group + " надевает на себя " + this);
         }
