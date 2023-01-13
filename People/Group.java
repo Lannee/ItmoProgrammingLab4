@@ -2,6 +2,9 @@ package People;
 
 import Classes.*;
 import Interfaces.*;
+import Items.Food;
+import Items.Item;
+import Locations.Location;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,38 +38,30 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
         return name;
     }
 
-    public void addStatus(Status status) {
-//        System.out.println(this + " получила статус " + status.name());
+    public void addStatus(Status status, Messager messager) {
+        if(messager != null) messager.addMessage(this + " получает статус \"" + status.getTranslation() + "\".\n");
         for(T participant : participants) {
-            participant.addStatus(status);
+            participant.addStatus(status, null);
         }
     }
 
-    public int getCourage() {
-        int result = 0;
-        for(T participant : participants) {
-            result += participant.getCourage();
-        }
-        return result / participants.size();
-    }
-
-    public void setCourage(int courage) {
-        System.out.println(" осмелели");
+    public void setCourage(int courage, Messager messager) {
+        if(messager != null) messager.addMessage(" осмелели.\n");
         for(T participant : participants) {
             participant.setCourage(courage);
         }
     }
 
-    public void addItem(Item item) {
-        System.out.println(this + " обрели предмет " + item);
+    public void addItem(Item item, Messager messager) {
+        if(messager != null) messager.addMessage(this + " обрели предмет " + item + ".\n");
         for(T participant : participants) {
             participant.getStorage().addItem(item);
         }
     }
 
 
-    public void setFear(int fear) {
-        System.out.println(this + " испугались.");
+    public void setFear(int fear, Messager messager) {
+        if(messager != null) messager.addMessage(this + " испугались.\n");
         for(T participant : this.participants) {
             participant.setFear(fear);
         }
@@ -80,58 +75,73 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
         return fear / this.participants.size();
     }
 
-
-    @Override
-    public void goTo(Person person, boolean interactive) {
-        if(interactive) {
-            System.out.println(this + " отправилась к персонажу " + person);
+    public int getGladness() {
+        int gladness = 0;
+        for(T participant : this.participants) {
+            gladness += participant.getFear();
         }
-        for(T participant : participants) {
-            participant.setPosition(person.getPosition());
+        return gladness / this.participants.size();
+    }
+    @Override
+    public void goTo(Person person, Messager messager) {
+        if(messager != null) messager.addMessage(this + " отправилася к персонажу " + person + ".\n");
+        for(T participant : getParticipants()) {
+            participant.goTo(person, null);
         }
     }
 
     @Override
-    public void goTo(Factory factory, boolean interactive) {
-        if(interactive) {
-            System.out.println(this + " отправилась на фабрику " + factory);
-        }
-        for(T participant : participants) {
-            participant.setPosition(factory.getPosition());
+    public void goTo(Location location, Messager messager) {
+        if(messager != null) messager.addMessage(this + " отправилася в локацию " + location + ".\n");
+        for(T participant : getParticipants()) {
+            participant.goTo(location, null);
         }
     }
 
     @Override
-    public void say(String phrase) {
-        System.out.println(this + " говорит: " + phrase);
+    public void goTo(Group<?> group, Messager messager) {
+        if(messager != null) messager.addMessage(this + " отправилася к " + group + ".\n");
+        for(T participant : getParticipants()) {
+            participant.goTo(group.getParticipants().get(0), null);
+        }
+    }
+
+    public void feed(Person person, Messager messager) {
+        for(Person participant : participants) {
+            Item food = participant.getStorage().getItemByClass(Food.class);
+            if(food != null) {
+                if(messager != null) messager.addMessage(this + " кормят персонажа " + person + ".\n");
+                participant.getStorage().removeItem(food);
+                person.getStorage().addItem(food);
+                break;
+            }
+        }
     }
 
     @Override
-    public void bury(ItemType itemType, Terrain terrain, boolean interactive) {
-        if(interactive) {
-            System.out.print(this + " закапывает предметы ");
-        }
-        this.hide(itemType, terrain.getStash(), false);
+    public void say(String phrase, Messager messager) {
+        if(messager != null) messager.addMessage(this + " говорит: \"" + phrase + "\".\n");
     }
 
     @Override
-    public void hide(ItemType itemType, Stash stash, boolean interactive) {
-        if(interactive) {
-            System.out.println(this + " прячет ");
-        }
+    public void bury(Class<? extends Item> itemClass, Terrain terrain, Messager messager) {
+        if(messager != null) messager.addMessage(this + " закапывает предметы ");
+        this.hide(itemClass, terrain.getStash(), messager);
+        if(messager != null) messager.addMessage(".\n");
+    }
+
+    @Override
+    public void hide(Class<? extends Item> itemClass, Stash stash, Messager messager) {
         for(T participant : this.getParticipants()) {
-            participant.hide(itemType, stash, false);
+            participant.hide(itemClass, stash, messager);
         }
-        System.out.println();
     }
 
     @Override
-    public void give(Item item, Person person, boolean interactive) {
+    public void give(Item item, Person person, Messager messager) {
         for (T participant : this.participants) {
             if(participant.isCloseTo(person)) {
-                if(interactive) {
-                    System.out.println(this + " передает " + item + " персонажу " + person);
-                }
+                if(messager != null) messager.addMessage(this + " передает " + item + " персонажу " + person + ".\n");
                 for(T par : this.getParticipants()) {
                     if(par.getStorage().contains(item)) {
                         par.getStorage().removeItem(item);
@@ -147,10 +157,8 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
     }
 
     @Override
-    public void give(Item item, Group<?> group, boolean interactive) {
-        if(interactive) {
-            System.out.println(this + " передает " + item + " группе " + group);
-        }
+    public void give(Item item, Group<?> group, Messager messager) {
+        if(messager != null) messager.addMessage(this + " передает " + item + " группе " + group + ".\n");
         for(T participant1 : this.getParticipants()) {
             if(participant1.getStorage().contains(item)) {
                 for(int i = 0; i < group.getParticipants().size(); i++) {
@@ -162,14 +170,12 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
     }
 
     @Override
-    public void throwAway(ItemType itemType, boolean interactive) {
-        if(interactive) {
-            System.out.print(this + " выкидывает предметы ");
-        }
+    public void throwAway(Class<? extends Item> itemClass, Messager messager) {
+        if(messager != null) messager.addMessage(this + " выкидывает предметы ");
         for(int i = 0; i < this.getParticipants().size(); i++) {
-            this.getParticipants().get(i).throwAway(itemType, false);
+            this.getParticipants().get(i).throwAway(itemClass, messager);
         }
-        System.out.println();
+        if(messager != null) messager.addMessage(".\n");
     }
 
     @Override
@@ -185,18 +191,17 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!super.equals(o)) return false;
-        if (this.getClass() != o.getClass()) return false;
-        Group<Person> oGrp = (Group<Person>)o;
-        if (this.name == null) {
-            if (oGrp.name != null ) return false;
-        } else if (!this.name.equals(oGrp.name))
+        if (getClass() != o.getClass()) return false;
+        Group<T> oGrp = (Group<T>)o;
+        if (name == null) {
+            if (oGrp.name != null) return false;
+        } else if (!name.equals(oGrp.name))
             return false;
-        if(!this.participants.equals(oGrp.participants)) return false;
-        return true;
+        return participants.equals(oGrp.participants);
     }
 
     @Override
     public String toString() {
-        return "\"" + this.getName() + "\"";
+        return "\"" + getName() + "\"";
     }
 }

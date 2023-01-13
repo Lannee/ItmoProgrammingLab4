@@ -1,7 +1,9 @@
 package People;
 
+import Classes.Messager;
 import Interfaces.Oppose;
 
+import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -15,8 +17,8 @@ public class PolicemanGroup extends Group<Policeman> implements Oppose {
     }
 
     @Override
-    public void oppose(Group<?> group) {
-        System.out.println(this + " выступают против " + group);
+    public void oppose(Group<?> group, Messager messager) {
+        if(messager != null) messager.addMessage(this + " выступают против " + group);
     }
 
 }

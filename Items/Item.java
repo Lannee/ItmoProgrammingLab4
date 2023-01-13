@@ -1,12 +1,10 @@
-package Classes;
+package Items;
 
-public class Item {
+public abstract class Item {
     private String name;
-    protected ItemType itemType;
 
     public Item(String name) {
         this.name = name;
-        this.itemType = null;
     }
 
     public Item() {
@@ -15,10 +13,6 @@ public class Item {
 
     public String getName() {
         return name;
-    }
-
-    public ItemType getType() {
-        return itemType;
     }
 
     @Override

@@ -1,31 +1,52 @@
 package People;
 
-import Classes.Factory;
+import Classes.Messager;
+import Exeptions.EmptyGroupException;
+import Locations.Factory;
 import Classes.Status;
-import Classes.Weightlessness;
+import Items.Weightlessness;
 import Interfaces.Banish;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class WorkersGroup extends Group<Worker> implements Banish {
-    private Factory factory;
+    private final Factory factory;
     private static int amount = 0;
 
-    public static WorkersGroup getAny(ArrayList<WorkersGroup> groups) {
-        if(groups.isEmpty()) return (WorkersGroup)null;
-        System.out.print("Некоторые группы рабочих");
+    public static WorkersGroup getAny(ArrayList<WorkersGroup> groups, Messager messager) {
+        if(groups.isEmpty()) return null;
+        messager.addMessage("Некоторые группы рабочих");
         return groups.get((int)(Math.random() * groups.size() - 1));
     }
 
     public WorkersGroup(Factory factory, String name, Worker[] workers) {
         this.name = name;
+        if(workers.length == 0) throw new EmptyGroupException();
         this.participants.addAll(Arrays.asList(workers));
         this.factory = factory;
     }
 
-    public WorkersGroup(Factory factory, String name) {
-        this(factory, name, null);
+    public int getAvrgSalary() {
+        int output = 0;
+        if(getParticipants().isEmpty()) return 0;
+        for(Worker worker : getParticipants()) {
+            output += worker.getSalary();
+        }
+        return output / getParticipants().size();
+    }
+
+    public void setSalary(int salary, Messager messager) {
+        if(!getParticipants().isEmpty()) {
+            if(messager != null) {
+                messager.addMessage(this + " стали получать за свою работу ");
+                if(getAvrgSalary() > salary) messager.addMessage("меньше.\n");
+                else messager.addMessage("больше.\n");
+            }
+            for(Worker worker : getParticipants()) {
+                worker.setSalary(salary, null);
+            }
+        }
     }
 
     public WorkersGroup(Factory factory, Worker[] workers) {
@@ -47,18 +68,15 @@ public class WorkersGroup extends Group<Worker> implements Banish {
     }
 
     @Override
-    public void banish(Chief chief) {
+    public void banish(Chief chief, Messager messager) {
         for(Worker worker : this.participants) {
             if(worker.hasStatus(Status.WEIGHTLESSNESS) || worker.getStorage().contains(new Weightlessness()) || worker.getCourage() >= 70) {
                 if (!this.participants.isEmpty()) {
-                    System.out.println(this + " прогоняют персонажа " + chief);
+                    if(messager != null) messager.addMessage(this + " прогоняют персонажа " + chief + ".\n");
                     this.factory.setChief(null);
-                } else {
-                    System.out.println("В группе некому прогонять персонажа " + chief.getName() + ".");
                 }
-                break;
             }
+            break;
         }
     }
-
 }

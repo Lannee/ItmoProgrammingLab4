@@ -1,9 +1,9 @@
 package Classes;
 
-import Interfaces.ThrowAway;
+import Items.Item;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Objects;
 
 public class Storage {
     private ArrayList<Item> items = new ArrayList<Item>();
@@ -41,23 +41,35 @@ public class Storage {
         return false;
     }
 
-    public ArrayList<Item> getItemsByClass(ItemType itemType) {
+    public ArrayList<Item> getItemsByClass(Class<? extends Item> itemClass) {
         ArrayList<Item> itemsWithClass = new ArrayList<Item>();
-        for(Item item : this.getItems()) {
-            if(item.getType() == itemType) {
+        for(Item item : getItems()) {
+            if(item.getClass() == itemClass) {
                 itemsWithClass.add(item);
             }
         }
         return itemsWithClass;
     }
 
-    public Item getItemByClass(ItemType itemType) {
+    public Item getItemByClass(Class<? extends Item> itemClass) {
         for(Item item : this.getItems()) {
-            if(item.getType() == itemType) {
+            if(item.getClass() == itemClass) {
                 return item;
             }
         }
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Storage storage = (Storage) o;
+        return Objects.equals(items, storage.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() * 31 + items.hashCode();
+    }
 }

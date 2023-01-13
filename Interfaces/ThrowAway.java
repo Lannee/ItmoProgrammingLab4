@@ -1,9 +1,9 @@
 package Interfaces;
 
-import Classes.Item;
-import Classes.ItemType;
+import Items.Item;
+import Classes.Messager;
 
 public interface ThrowAway {
-    void throwAway(ItemType itemType, boolean interactive);
+    void throwAway(Class<? extends Item> itemClass, Messager messager);
 
 }

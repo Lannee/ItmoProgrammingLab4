@@ -1,9 +1,9 @@
 package Interfaces;
 
-import Classes.Item;
-import Classes.ItemType;
+import Items.Item;
+import Classes.Messager;
 import Classes.Stash;
 
 public interface Hide {
-    void hide(ItemType itemType, Stash stash, boolean interactive);
+    void hide(Class<? extends Item> itemClass, Stash stash, Messager messager);
 }

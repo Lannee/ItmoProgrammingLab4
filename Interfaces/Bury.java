@@ -1,11 +1,9 @@
 package Interfaces;
 
-import Classes.Item;
-import Classes.ItemType;
+import Items.Item;
+import Classes.Messager;
 import Classes.Terrain;
-import People.Group;
-import People.Person;
 
 public interface Bury {
-    void bury(ItemType itemType, Terrain terrain, boolean interactive);
+    void bury(Class<? extends Item> itemClass, Terrain terrain, Messager messager);
 }
