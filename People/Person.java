@@ -2,6 +2,7 @@ package People;
 
 import Classes.*;
 
+import Exeptions.StorageDoesNotContainsItemException;
 import Interfaces.*;
 import Items.Item;
 import Items.ItemEntity;
@@ -200,18 +201,19 @@ public class Person implements Say, Bury, Hide, Give, ThrowAway, GoTo {
     }
 
     @Override
-    public void bury(Class<? extends Item> itemClass, Terrain terrain, Messager messager) {
+    public void bury(Class<? extends Item> itemClass, Terrain terrain, Messager messager) throws StorageDoesNotContainsItemException {
         if(messager != null) messager.addMessage(this + " закапывает предметы ");
-        this.hide(itemClass, terrain.getStash(), messager);
+        hide(itemClass, terrain.getStash(), messager);
         if(messager != null) messager.addMessage(".\n");
     }
 
     @Override
-    public void hide(Class<? extends Item> itemClass, Stash stash, Messager messager) {
+    public void hide(Class<? extends Item> itemClass, Stash stash, Messager messager) throws StorageDoesNotContainsItemException {
         ArrayList<Item> items = getStorage().getItemsByClass(itemClass);
+        if(storage.getItemByClass(itemClass) == null) throw new StorageDoesNotContainsItemException();
         for(Item item : items) {
             if(messager != null) messager.addMessage(item.getName() + " ");
-            this.getStorage().removeItem(item);
+            getStorage().removeItem(item);
             stash.getStorage().addItem(item);
         }
     }
@@ -224,23 +226,23 @@ public class Person implements Say, Bury, Hide, Give, ThrowAway, GoTo {
     }
 
     @Override
-    public void give(Item item, Person person, Messager messager) {
+    public void give(Item item, Person person, Messager messager) throws StorageDoesNotContainsItemException {
         if(messager != null) messager.addMessage(this + " передает " + item + " персонажу " + person + ".\n");
-        if(this.getStorage().contains(item)) {
-            this.getStorage().removeItem(item);
+        if(getStorage().contains(item)) {
+            getStorage().removeItem(item);
             person.getStorage().addItem(item);
-        }
+        } else throw new StorageDoesNotContainsItemException();
     }
 
     @Override
-    public void give(Item item, Group<?> group, Messager messager) {
+    public void give(Item item, Group<?> group, Messager messager) throws StorageDoesNotContainsItemException {
         if(messager != null) messager.addMessage(this + " передает " + item + " группе " + group + ".\n");
-        if(this.getStorage().contains(item)) {
-            this.getStorage().removeItem(item);
+        if(getStorage().contains(item)) {
+            getStorage().removeItem(item);
             for(int i = 0; i < group.getParticipants().size(); i++) {
                 group.getParticipants().get(i).getStorage().addItem(item);
             }
-        }
+        } else throw new StorageDoesNotContainsItemException();
     }
 
     public boolean isCloseTo(Person person) {
@@ -258,11 +260,12 @@ public class Person implements Say, Bury, Hide, Give, ThrowAway, GoTo {
     }
 
     @Override
-    public void throwAway(Class<? extends Item> itemClass, Messager messager) {
-        ArrayList<Item> items = this.getStorage().getItemsByClass(itemClass);
+    public void throwAway(Class<? extends Item> itemClass, Messager messager) throws StorageDoesNotContainsItemException {
+        ArrayList<Item> items = getStorage().getItemsByClass(itemClass);
         for(Item item : items) {
             if(messager != null) messager.addMessage(item.getName() + " ");
-            this.getStorage().removeItem(item);
+            if(storage.getItemByClass(itemClass) == null) throw new StorageDoesNotContainsItemException();
+            getStorage().removeItem(item);
         }
     }
 

@@ -1,6 +1,7 @@
 package People;
 
 import Classes.Messager;
+import Exeptions.EmptyGroupException;
 import Interfaces.Oppose;
 
 import java.lang.reflect.Member;
@@ -13,6 +14,7 @@ public class PolicemanGroup extends Group<Policeman> implements Oppose {
 
     public PolicemanGroup(String name, Policeman[] policemen) {
         this.name = name;
+        if(policemen.length < 2) throw new EmptyGroupException();
         this.participants.addAll(Arrays.asList(policemen));
     }
 

@@ -1,3 +1,4 @@
+import Exeptions.StorageDoesNotContainsItemException;
 import Items.*;
 import Locations.Facility;
 import Locations.Factory;
@@ -59,7 +60,11 @@ public class Main {
         Factory fac2 = new Factory(new Chief(), workers2);
         WorkersGroup wg2 = new WorkersGroup(fac2, workers2);
         wg2.goTo(astronaut, messager);
-        astronaut.give(new Weightlessness(), wg2, messager);
+        try {
+            astronaut.give(new Weightlessness(), wg2, messager);
+        } catch (StorageDoesNotContainsItemException sdncie) {
+            messager.addMessage(astronaut + " не может дать предмет, которого у него нет.");
+        }
         wg2.goTo(wg2.getFactory(), messager);
         new Weightlessness().activate(wg2, messager);
 
@@ -86,9 +91,17 @@ public class Main {
         PolicemanGroup pg = new PolicemanGroup("Группа полицейских", new Policeman[]{pm1 ,pm2});
         pg.setFear(70, messager);
         if(pg.getFear() >= 50) {
-            pg.throwAway(Gun.class, messager);
+            try {
+                pg.throwAway(Gun.class, messager);
+            } catch (StorageDoesNotContainsItemException sdncie) {
+                messager.addMessage(pg + " не может выбросить предметы, которых у нее нет.");
+            }
             Terrain tr = new Terrain();
-            pg.bury(Clothes.class, tr, messager);
+            try {
+                pg.bury(Clothes.class, tr, messager);
+            } catch (StorageDoesNotContainsItemException sdncie) {
+                messager.addMessage(pg + " не может закопать предметы, которых у нее нет.");
+            }
             new Clothes("Одежда рабочих").dress(pg, messager);
             pg.say("Это гораздо приятнее, чем летать сломя голову по воздуху в состоянии невесомости, получая ожоги, ранения и увечья", messager);
         }

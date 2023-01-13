@@ -1,6 +1,8 @@
 package People;
 
 import Classes.*;
+import Exeptions.EmptyGroupException;
+import Exeptions.StorageDoesNotContainsItemException;
 import Interfaces.*;
 import Items.Food;
 import Items.Item;
@@ -17,6 +19,7 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
 
     public Group(String name, T[] participants) {
         this.name = name;
+        if(participants.length < 2) throw new EmptyGroupException();
         this.participants.addAll(Arrays.asList(participants));
     }
 
@@ -124,56 +127,56 @@ public class Group<T extends Person> implements GoTo, Say, Hide, Give, Bury, Thr
     }
 
     @Override
-    public void bury(Class<? extends Item> itemClass, Terrain terrain, Messager messager) {
+    public void bury(Class<? extends Item> itemClass, Terrain terrain, Messager messager) throws StorageDoesNotContainsItemException {
         if(messager != null) messager.addMessage(this + " закапывает предметы ");
-        this.hide(itemClass, terrain.getStash(), messager);
+        hide(itemClass, terrain.getStash(), messager);
         if(messager != null) messager.addMessage(".\n");
     }
 
     @Override
-    public void hide(Class<? extends Item> itemClass, Stash stash, Messager messager) {
+    public void hide(Class<? extends Item> itemClass, Stash stash, Messager messager) throws StorageDoesNotContainsItemException {
         for(T participant : this.getParticipants()) {
             participant.hide(itemClass, stash, messager);
         }
     }
 
     @Override
-    public void give(Item item, Person person, Messager messager) {
-        for (T participant : this.participants) {
+    public void give(Item item, Person person, Messager messager) throws StorageDoesNotContainsItemException {
+        for (T participant : participants) {
             if(participant.isCloseTo(person)) {
-                if(messager != null) messager.addMessage(this + " передает " + item + " персонажу " + person + ".\n");
-                for(T par : this.getParticipants()) {
+                for(T par : participants) {
                     if(par.getStorage().contains(item)) {
+                        if(messager != null) messager.addMessage(this + " передает " + item + " персонажу " + person + ".\n");
                         par.getStorage().removeItem(item);
                         person.getStorage().addItem(item);
-                        break;
+                        return;
                     }
 
                 }
-                break;
+                throw new StorageDoesNotContainsItemException();
             }
         }
 
     }
 
     @Override
-    public void give(Item item, Group<?> group, Messager messager) {
+    public void give(Item item, Group<?> group, Messager messager) throws StorageDoesNotContainsItemException {
         if(messager != null) messager.addMessage(this + " передает " + item + " группе " + group + ".\n");
-        for(T participant1 : this.getParticipants()) {
+        for(T participant1 : participants) {
             if(participant1.getStorage().contains(item)) {
                 for(int i = 0; i < group.getParticipants().size(); i++) {
                     group.getParticipants().get(i).getStorage().addItem(item);
                 }
                 break;
-            }
+            } else throw new StorageDoesNotContainsItemException();
         }
     }
 
     @Override
-    public void throwAway(Class<? extends Item> itemClass, Messager messager) {
+    public void throwAway(Class<? extends Item> itemClass, Messager messager) throws StorageDoesNotContainsItemException {
         if(messager != null) messager.addMessage(this + " выкидывает предметы ");
-        for(int i = 0; i < this.getParticipants().size(); i++) {
-            this.getParticipants().get(i).throwAway(itemClass, messager);
+        for(int i = 0; i < getParticipants().size(); i++) {
+            getParticipants().get(i).throwAway(itemClass, messager);
         }
         if(messager != null) messager.addMessage(".\n");
     }

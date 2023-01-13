@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public abstract class Facility extends Location {
 
-    ArrayList<Person> employees = new ArrayList<>();
+    protected ArrayList<Person> employees = new ArrayList<>();
 
     public Facility(String name) {
         super(name);

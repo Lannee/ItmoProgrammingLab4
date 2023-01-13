@@ -22,7 +22,7 @@ public class WorkersGroup extends Group<Worker> implements Banish {
 
     public WorkersGroup(Factory factory, String name, Worker[] workers) {
         this.name = name;
-        if(workers.length == 0) throw new EmptyGroupException();
+        if(workers.length < 2) throw new EmptyGroupException();
         this.participants.addAll(Arrays.asList(workers));
         this.factory = factory;
     }
